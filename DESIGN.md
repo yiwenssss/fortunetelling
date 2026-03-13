@@ -375,7 +375,196 @@ POST /api/chat (first call, no chart)
 
 ---
 
-## 11. Out of Scope (v1.0)
+## 11. Design Style
+
+### 11.1 Design Philosophy
+
+Inspired by Co-Star's aesthetic: **stark, editorial, intimate**. The app treats fortune-telling as a serious, data-driven practice — not a carnival game. No gradients, no gold glitter, no neon. The visual restraint creates contrast with the mystical subject matter, making the readings feel more credible and personal.
+
+Adapted for Chinese metaphysics: the Co-Star monochrome base is kept intact, with **one accent color** — cinnabar red — used sparingly to reference the ink of classical Chinese almanacs and oracle bones. Everything else is black and white.
+
+---
+
+### 11.2 Color Palette
+
+| Token | Value | Usage |
+|---|---|---|
+| `color-bg` | `#0A0A0A` | Page background — near-black, not pure black, to reduce harshness |
+| `color-surface` | `#111111` | Card / modal backgrounds |
+| `color-border` | `#2A2A2A` | Subtle dividers, card borders |
+| `color-text-primary` | `#F5F5F0` | Body text — warm off-white, not pure white |
+| `color-text-secondary` | `#888880` | Secondary labels, timestamps, placeholders |
+| `color-text-muted` | `#444440` | Disabled states, decorative glyphs |
+| `color-accent` | `#C0392B` | Cinnabar red — used only for: luck rating stars, key palace names, CTA buttons |
+| `color-accent-muted` | `#7A1F17` | Hover state for accent elements |
+
+**Rules:**
+- Never use `color-accent` on more than one element per viewport at a time.
+- No other colors. No blues, purples, or gradients.
+- The red is a whisper, not a shout.
+
+---
+
+### 11.3 Typography
+
+Co-Star pairs an editorial serif display face with a neutral grotesque. We do the same, adding a Chinese font to the stack.
+
+| Role | Font | Weight | Size |
+|---|---|---|---|
+| Display / headings | `Playfair Display` (serif) | 400 regular, 700 bold | 32–48px |
+| Body / chat | `Inter` (sans-serif) | 300 light, 400 regular | 15–16px |
+| Chinese characters | `Noto Serif SC` | 400 regular | Matches surrounding size |
+| Monospace / chart data | `JetBrains Mono` | 400 regular | 13px |
+| Decorative glyphs (宜/忌 labels, pillar headers) | `Noto Serif SC` | 700 bold | 11–12px, letter-spaced |
+
+```css
+/* Font stack examples */
+--font-display: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+--font-body:    'Inter', 'Noto Sans SC', system-ui, sans-serif;
+--font-mono:    'JetBrains Mono', monospace;
+```
+
+**Rules:**
+- Headings: Playfair Display, left-aligned or centered, no italics except for emphasis quotes.
+- Chinese content in body copy: `Noto Serif SC` renders inline — do not use a separate `<span>` with a different size.
+- Never bold body text for emphasis; use `color-text-secondary` or spacing instead.
+- Line height: 1.7 for body, 1.2 for display.
+- Max line length: 60ch for reading comfort.
+
+---
+
+### 11.4 Layout & Spacing
+
+Follows Co-Star's single-column, centered, generous-whitespace approach.
+
+| Token | Value |
+|---|---|
+| `space-xs` | 4px |
+| `space-sm` | 8px |
+| `space-md` | 16px |
+| `space-lg` | 32px |
+| `space-xl` | 64px |
+| `space-2xl` | 128px |
+| Max content width | 640px |
+| Page horizontal padding | 24px (mobile), 48px (desktop) |
+
+**Rules:**
+- All content is single-column, centered within `max-w-[640px]`.
+- Section breaks use `space-2xl` vertical padding — breathe.
+- No sidebars, no multi-column layouts.
+- Cards: no box shadows. Border only: `1px solid color-border`.
+
+---
+
+### 11.5 Iconography & Illustrations
+
+Co-Star uses thin, geometric line illustrations of planets and constellation maps. We adapt this for Chinese astronomy.
+
+**Style:**
+- Stroke-only SVG illustrations. No fills.
+- Stroke weight: 1px at display size. Never bold.
+- Motifs: star fields, circular 命盘 grids, Eight Trigrams (八卦) outlines, constellation lines, the 12 Earthly Branch animals as minimal line glyphs.
+- The 紫微 命盘 is rendered as a **12-cell grid SVG** with palace labels — functional illustration, not decorative.
+
+**Do not use:**
+- Emoji astrology symbols (♈♉ etc.) — too playful.
+- Clip-art zodiac illustrations.
+- Any color fills in illustrations.
+
+---
+
+### 11.6 Motion & Animation
+
+Co-Star uses slow, deliberate animation — nothing bounces or slides quickly.
+
+| Element | Animation |
+|---|---|
+| Page load | Fade in, 600ms ease-out |
+| Streaming text | Characters appear word-by-word, no cursor blink effect |
+| Luck stars rating | Stars fill left-to-right on load, 800ms staggered, 80ms delay each |
+| Chat bubble arrival | Fade in from 8px below, 300ms ease-out |
+| CTA hover | Underline draws in from left, 200ms |
+| Loading state | Single slow-pulsing dot (not a spinner) |
+
+**Rules:**
+- `prefers-reduced-motion`: all animations disabled, content appears instantly.
+- No parallax.
+- No particle effects or canvas star-fields — too heavy.
+
+---
+
+### 11.7 UI Components
+
+#### Buttons
+Two variants only:
+
+```
+Primary (CTA):
+  Background: transparent
+  Border: 1px solid color-text-primary
+  Text: color-text-primary, Inter 400, 13px, letter-spacing 0.12em, uppercase
+  Hover: background color-surface, border color-accent
+
+Ghost / link:
+  No border, no background
+  Text: color-text-secondary, underline on hover
+```
+
+#### Cards
+```
+Background: color-surface
+Border: 1px solid color-border
+Border-radius: 0px  ← sharp corners, no rounding
+Padding: space-lg (32px)
+```
+
+#### Form inputs
+```
+Background: transparent
+Border-bottom: 1px solid color-border  ← underline only, no box
+Border-radius: 0
+Text: color-text-primary
+Placeholder: color-text-muted
+Focus: border-bottom color changes to color-text-primary
+```
+
+#### Chat bubbles
+```
+User message:
+  Alignment: right
+  Background: color-surface
+  Border: 1px solid color-border
+  Max-width: 75%
+
+Assistant message:
+  Alignment: left
+  Background: transparent
+  No border
+  Max-width: 90%
+  Text: color-text-primary, Playfair Display for first sentence, Inter for rest
+```
+
+#### Luck rating stars
+```
+Filled star: color-accent (#C0392B)
+Empty star: color-border (#2A2A2A)
+Character: ✦ (not ★)
+Size: 18px, letter-spacing: 4px
+```
+
+---
+
+### 11.8 Reference Screenshots
+
+Key Co-Star patterns to replicate:
+1. **Home screen** — full-bleed black background, single centered headline, two text-link CTAs with thin underlines. No hero image.
+2. **Daily horoscope card** — plain white text on black, section headers in small-caps, content in serif body font.
+3. **Birth chart grid** — minimal line-drawn circular chart, palace/house labels in tiny uppercase sans-serif.
+4. **Notification copy** — short, declarative, slightly unsettling. e.g. "You may be avoiding something." Apply same tone to fortune readings.
+
+---
+
+## 12. Out of Scope (v1.0)
 
 - User accounts / cloud sync
 - Push notifications
