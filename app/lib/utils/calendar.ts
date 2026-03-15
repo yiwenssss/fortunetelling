@@ -160,7 +160,8 @@ export function getTodayDateString(): string {
 export function formatLunarDate(dateString: string): string {
   try {
     const [year, month, day] = dateString.split('-').map(Number);
-    const lunarDate = Lunar.fromSolar(year, month, day);
+    const solar = (Solar as any).fromYmd(year, month, day);
+    const lunarDate = solar.getLunar();
     if (!lunarDate) return dateString;
     
     const lunarMonth = lunarDate.getLunarMonth();
